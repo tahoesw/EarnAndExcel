@@ -1,0 +1,147 @@
+---
+title: "Statistics selectVisualization"
+author: "Winston Lee"
+date: "2022-08-18"
+output: html_document
+---
+```{r examples}
+library(dplyr)
+library(Rmisc)
+
+# Correlation
+plot(cars$speed, cars$dist)
+cor(cars$speed, cars$dist)
+
+plot(iris$Sepal.Length, iris$Sepal.Width)
+cor(iris$Sepal.Length, iris$Sepal.Width)
+my_iris = within(iris, rm(Species))
+# OR
+my_iris = select(iris, -Species)
+cor(my_iris)
+plot(iris$Petal.Length, iris$Petal.Width)
+
+# St dev
+heights = c(65, 67, 68.5, 64, 69, 67, 71, 65)
+lo_height = mean(heights) - sd(heights) * 2
+hi_height = mean(heights) + sd(heights) * 2
+
+hist(rnorm(10000000, 50, 10))
+
+# Confidence Intervals
+# 50 people, mean IQ = 100, st dev = 15
+IQs = rnorm(50, 100, 15)
+CI(IQs)
+
+# One Sample T-Test
+# Null Hypothesis: Average height is 69
+# Alternate hyp: Average height is < 69
+
+t.test(heights, mu=69, alternative = "less")
+
+#Output:
+# 	One Sample t-test
+# 
+# data:  heights
+# t = -2.3152, df = 7, p-value = 0.02689
+# alternative hypothesis: true mean is less than 69
+# 95 percent confidence interval:
+#    -Inf 68.648
+# sample estimates:
+# mean of x 
+#   67.0625 
+#
+# ==> Since p-value is < 0.05, reject null hyp in favor of alt hyp <==
+# NOTE: for this to be true, sample MUST be representative
+
+# Two Sample T-Test
+
+heights2 = rnorm(8, 70, 1.5)
+nyc_heights = heights
+la_heights = heights2
+
+# Null Hypothesis: mean la, nyc heights =
+# Alternate hyp: mean nyc < la
+
+t.test(nyc_heights, la_heights, alternative = "less")
+
+#Output:
+# 	Welch Two Sample t-test
+# 
+# data:  nyc_heights and la_heights
+# t = -2.7967, df = 9.4061, p-value = 0.009994
+# alternative hypothesis: true difference in means is less than 0
+# 95 percent confidence interval:
+#        -Inf -0.8830643
+# sample estimates:
+# mean of x mean of y 
+#   67.0625   69.6019
+# ==> Since p-value is < 0.05, reject null hyp in favor of alt hyp <==
+
+# Two Sample T-Test of Proportions
+# 21 of 50 nyc say fav color is blue
+# 34 of 50 la say fav color is blue
+# Null Hypothesis: blue favored equally in nyc, la
+# Alternate hyp: blue favored less in nyc
+
+prop.test(x = c(21, 34), n = c(50, 50), alternative = "less")
+
+#Output:
+# 	2-sample test for equality of proportions with continuity correction
+# 
+# data:  c(21, 34) out of c(50, 50)
+# X-squared = 5.8182, df = 1, p-value = 007931
+# alternative hypothesis: two.sided
+# 95 percent confidence interval:
+#  -1.00000000 -0.08202553
+# sample estimates:
+# prop 1 prop 2 
+#   0.42   0.68 
+# ==> Since p-value is < 0.05, reject null hyp in favor of alt hyp <==
+
+# ANOVA
+mean(filter(iris, Species == "setosa")$Petal.Length)
+mean(filter(iris, Species == "versicolor")$Petal.Length)
+mean(filter(iris, Species == "virginica")$Petal.Length)
+
+# Null Hypothesis: no difference in petal lengths between species
+# Alternate Hypothesis: is a difference in petal lengths between species
+
+anova(lm(Petal.Length~Species, data = iris))
+
+#Output:
+# Analysis of Variance Table
+# 
+# Response: Petal.Length
+#            Df Sum Sq Mean Sq F value    Pr(>F)    
+# Species     2 437.10 218.551  1180.2 < 2.2e-16 ***
+# Residuals 147  27.22   0.185                      
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+# p-value so small that it's 99.99+% sure there is a difference in petal lengths between species
+
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

@@ -1,0 +1,271 @@
+---
+title: "ML"
+author: "Winston Lee"
+date: "2022-08-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r ml}
+paste("*** 1. Simple Linear Regression in R")
+
+lm(dist ~ speed, data = cars)
+# Output:
+# 
+# Call:
+# lm(formula = dist ~ speed, data = cars)
+
+# Coefficients:
+# (Intercept)        speed  
+#     -17.579        3.932
+
+simple_linear_model = lm(dist ~ speed, data = cars)
+summary(simple_linear_model)
+# Output:
+# 
+# Call:
+# lm(formula = dist ~ speed, data = cars)
+# 
+# Residuals:
+#     Min      1Q  Median      3Q     Max 
+# -29.069  -9.525  -2.272   9.215  43.201 
+# 
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept) -17.5791     6.7584  -2.601   0.0123 *  
+# speed         3.9324     0.4155   9.464 1.49e-12 ***
+# ---             NOTE: p-value           ^^^^^^^^
+#         super-low value implies speed a significant predictor of distance
+#         ==> assuming null hypothesis is speed has no effect on distance
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+# Residual standard error: 15.38 on 48 degrees of freedom
+# Multiple R-squared:  0.6511,	Adjusted R-squared:  0.6438 
+# F-statistic: 89.57 on 1 and 48 DF,  p-value: 1.49e-12
+
+paste("***2. Multiple Linear Regression in R")
+lm(Petal.Width ~ Sepal.Length + Sepal.Width + Petal.Length, data = iris)
+# Output:
+# 
+# Call:
+# lm(formula = Petal.Width ~ Sepal.Length + Sepal.Width + Petal.Length, 
+#     data = iris)
+# 
+# Coefficients:
+#  (Intercept)  Sepal.Length   Sepal.Width  Petal.Length  
+#      -0.2403       -0.2073        0.2228        0.5241
+multiple_linear_model = lm(Petal.Width ~ Sepal.Length + Sepal.Width + Petal.Length, data = iris)
+summary(multiple_linear_model)
+# Output:
+# 
+# Call:
+# lm(formula = Petal.Width ~ Sepal.Length + Sepal.Width + Petal.Length, 
+#     data = iris)
+# 
+# Residuals:
+#      Min       1Q   Median       3Q      Max 
+# -0.60959 -0.10134 -0.01089  0.09825  0.60685 
+# 
+# Coefficients:
+#              Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  -0.24031    0.17837  -1.347     0.18    
+# Sepal.Length -0.20727    0.04751  -4.363 2.41e-05 ***
+# Sepal.Width   0.22283    0.04894   4.553 1.10e-05 ***
+# Petal.Length  0.52408    0.02449  21.399  < 2e-16 *** <== NOTE: super-low p-value
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Residual standard error: 0.192 on 146 degrees of freedom
+# Multiple R-squared:  0.9379,	Adjusted R-squared:  0.9366 
+# F-statistic: 734.4 on 3 and 146 DF,  p-value: < 2.2e-16``
+
+paste("***3. Logistic Regression in R")
+# what's the probability of getting a 1
+
+library(readr)
+titanic <- read_csv("../../../Data/titanic.csv")
+# rename column
+names(titanic)[names(titanic) == "Sex Code"] <- "SexCode"
+library(dplyr)
+# Make PClass numeric
+titanic <- transform(titanic, PClass=as.numeric(gsub("\\D+", "", PClass)))
+#select(titanic, c(Survived, PClass, Age, SexCode))
+single_logistic_model = glm(Survived ~ Age, data = titanic, family = "binomial")
+single_logistic_model
+
+# Output:
+# 
+# Call: glm(formula = Survived ~ Age, family = "binomial", data = titanic)
+# 
+# Coefficients:
+# (Intercept)          Age  
+#   -0.081428    -0.008795  
+# 
+# Degrees of Freedom: 755 Total (i.e. Null);  754 Residual
+#   (557 observations deleted due to missingness)
+# Null Deviance:	    1026 
+# Residual Deviance: 1023 	AIC: 1027
+
+summary(single_logistic_model)
+# Output:
+# 
+# Call:
+# glm(formula = Survived ~ Age, family = "binomial", data = titanic)
+# 
+# Deviance Residuals: 
+#     Min       1Q   Median       3Q      Max  
+# -1.1418  -1.0489  -0.9792   1.3039   1.4801  
+# 
+# Coefficients:
+#              Estimate Std. Error z value Pr(>|z|)  
+# (Intercept) -0.081428   0.173862  -0.468   0.6395  
+# Age         -0.008795   0.005232  -1.681   0.0928 .<== NOTE: implies insufficient evidence to support Age a predictor
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# (Dispersion parameter for binomial family taken to be 1)
+# 
+#     Null deviance: 1025.6  on 755  degrees of freedom
+# Residual deviance: 1022.7  on 754  degrees of freedom
+#   (557 observations deleted due to missingness)
+# AIC: 1026.7
+# 
+# Number of Fisher Scoring iterations: 4
+
+multi_logistic_model = glm(Survived ~ PClass + Age + SexCode, data = titanic, family = "binomial")
+multi_logistic_model
+
+# Output:
+# 
+## 
+## Call:  glm(formula = Survived ~ PClass + Age + SexCode, family = "binomial", 
+##     data = titanic)
+## 
+## Coefficients:
+## (Intercept)       PClass          Age      SexCode  
+##     2.36932     -1.25868     -0.03899      2.63170  
+## 
+## Degrees of Freedom: 755 Total (i.e. Null);  752 Residual
+##   (557 observations deleted due to missingness)
+## Null Deviance:       1026 
+## Residual Deviance: 695.2     AIC: 703.2
+
+summary(multi_logistic_model)
+# Output:
+# 
+# Call:
+## glm(formula = Survived ~ PClass + Age + SexCode, family = "binomial", 
+##     data = titanic)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.7165  -0.7130  -0.3901   0.6454   2.5309  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)  2.36932    0.43794   5.410 6.30e-08 ***
+## PClass      -1.25868    0.13768  -9.142  < 2e-16 ***
+## Age         -0.03899    0.00751  -5.192 2.08e-07 ***
+## SexCode      2.63170    0.20156  13.056  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1025.57  on 755  degrees of freedom
+## Residual deviance:  695.16  on 752  degrees of freedom
+##   (557 observations deleted due to missingness)
+## AIC: 703.16
+## 
+## Number of Fisher Scoring iterations: 5
+
+paste("***4. Decision Tree in R")
+library(tree)
+set.seed(0)
+# Age & Gender only
+titanic_model_data = select(titanic, c(Survived, Age, SexCode))
+# get the indices for train set
+train = sample(1 : nrow(titanic_model_data), 8 * nrow(titanic_model_data) / 10)
+train_set = titanic_model_data[train,]
+test_set = titanic_model_data[-train,]
+
+initial.tree = tree(Survived ~ ., split = "gini", data = train_set)
+summary(initial.tree)
+
+tree.predictions = round(predict(initial.tree, test_set))
+preds = table(tree.predictions, test_set$Survived)
+preds
+paste("Accuracy = ", (preds[1] + preds[4]) / (preds[1] + preds[2] + preds[3] + preds[4]))
+
+set.seed(0)
+# now add in PClass
+titanic_model_data = select(titanic, c(Survived, PClass, Age, SexCode))
+# get the indices for train set
+train = sample(1 : nrow(titanic_model_data), 8 * nrow(titanic_model_data) / 10)
+train_set = titanic_model_data[train,]
+test_set = titanic_model_data[-train,]
+
+initial.tree = tree(Survived ~ ., split = "gini", data = train_set)
+summary(initial.tree)
+
+tree.predictions = round(predict(initial.tree, test_set))
+preds = table(tree.predictions, test_set$Survived)
+preds
+paste("Accuracy = ", (preds[1] + preds[4]) / (preds[1] + preds[2] + preds[3] + preds[4]))
+
+# now predict on training set
+tree.predictions = round(predict(initial.tree, train_set))
+preds = table(tree.predictions, train_set$Survived)
+preds
+paste("Accuracy = ", (preds[1] + preds[4]) / (preds[1] + preds[2] + preds[3] + preds[4]))
+
+paste("***5. Random Forest in R")
+library(randomForest)
+set.seed(0)
+train_iris_indices = sample(1 : nrow(iris), 8 * nrow(iris) / 10)
+train_iris = iris[train_iris_indices,]
+test_iris = iris[-train_iris_indices,]
+rf_classifier = randomForest(Species ~ ., data = train_iris, ntree = 100, mtry = 2, importance = TRUE)
+rf_classifier
+rf_predictions = predict(rf_classifier, test_iris)
+preds = table(rf_predictions, test_iris$Species)
+preds
+
+numerator = 0
+denominator = 0
+k = 0
+for (i in 1 : ncol(preds))
+{
+for (j in 1 : nrow(preds))
+{
+k = k + 1
+denominator = denominator + preds[k]
+if (i == j)
+{
+numerator = numerator + preds[k]
+}
+}
+}
+paste("Accuracy = ", numerator / denominator)
+
+```{r cars}
+summary(cars)
+```
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

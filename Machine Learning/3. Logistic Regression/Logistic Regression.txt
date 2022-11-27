@@ -1,0 +1,1 @@
+tries to measure probability that an event happens (0 < x  < 1)

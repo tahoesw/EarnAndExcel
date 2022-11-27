@@ -1,0 +1,4 @@
+1. Linear relationship exists (ex: not random points or v-shapped pattern)
+2. Minimal Co-linearity (ex: Crime - using weather and high-school dropout rate)
+3. Normally Distributed Residuals - few outliers to screw up distribution
+	-can sometimes do log transformation to ameliorate
